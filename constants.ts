@@ -1,4 +1,4 @@
-// PASTE YOUR CONSTANTS.TS CODE HERE
+
 import { BusRoute, BusStatus, Student, StudentStatus, LogEntry, Tenant, Invoice, QuoteRequest, PurchaseOrder, DeviceGuide, PricingConfig, BudgetEntry, MaintenanceTicket } from "./types";
 
 export const INITIAL_ROUTES: BusRoute[] = [
