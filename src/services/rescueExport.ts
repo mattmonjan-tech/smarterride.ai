@@ -1,4 +1,3 @@
-
 import { INITIAL_ROUTES, INITIAL_STUDENTS, INITIAL_LOGS, INITIAL_TICKETS, INITIAL_BUDGET_DATA, RECOMMENDED_HARDWARE, MOCK_TENANTS, MOCK_INVOICES, MOCK_POS, MOCK_QUOTES, INITIAL_PRICING_CONFIG } from '../constants';
 
 const CONSTANTS_FILE_CONTENT = `import { BusRoute, BusStatus, Student, StudentStatus, LogEntry, Tenant, Invoice, QuoteRequest, PurchaseOrder, DeviceGuide, PricingConfig, BudgetEntry, MaintenanceTicket } from "./types";
