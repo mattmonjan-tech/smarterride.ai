@@ -40,6 +40,7 @@ import BudgetPlanner from './components/BudgetPlanner';
 import MaintenanceConsole from './components/MaintenanceConsole';
 import TelematicsIntegration from './components/TelematicsIntegration';
 import DriverApp from './components/DriverApp';
+import RescueDeploy from './components/RescueDeploy';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import MaintenanceModal from './components/MaintenanceModal';
 
@@ -74,7 +75,7 @@ const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
     </div>
 );
 
-const App = () => {
+export default function App() {
   // Auth State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'CLIENT' | 'ADMIN' | 'DRIVER' | 'MAINTENANCE'>('CLIENT');
@@ -243,7 +244,7 @@ const App = () => {
             let newLocation = student.lastScanLocation;
             let logMessage = '';
             let logType: 'BOARDING' | 'DISEMBARKING' | 'WRONG_BUS' = 'BOARDING';
-            let severity: 'info' | 'warning' | 'critical' = 'info';
+            let severity: 'info' | 'critical' = 'info';
             const isWrongBusEvent = Math.random() < 0.05;
 
             if (isWrongBusEvent && student.status === StudentStatus.OFF_BUS) {
@@ -1048,5 +1049,3 @@ const App = () => {
     </div>
   );
 }
-
-export default App;
