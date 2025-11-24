@@ -1,28 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  LayoutDashboard, 
-  Map as MapIcon, 
-  Users, 
-  Bell, 
-  Settings, 
-  Bus, 
-  LogOut, 
-  Search, 
-  ChevronRight, 
-  Pencil, 
-  User, 
-  GitMerge, 
-  AlertTriangle, 
-  Check, 
-  Cable, 
-  Upload, 
-  X, 
-  Shield, 
-  Calendar, 
-  Lock, 
-  DollarSign, 
-  Wrench, 
-  Tag 
+  LayoutDashboard, Map as MapIcon, Users, Bell, Settings, Bus, LogOut, Search, ChevronRight, Pencil, User, GitMerge, AlertTriangle, Check, Cable, Upload, X, Shield, Calendar, Lock, DollarSign, Wrench, Tag 
 } from 'lucide-react';
 import DashboardMetrics from './components/DashboardMetrics';
 import SimulatedMap from './components/SimulatedMap';
@@ -43,6 +21,7 @@ import DriverApp from './components/DriverApp';
 import RescueDeploy from './components/RescueDeploy';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import MaintenanceModal from './components/MaintenanceModal';
+import DriverScorecard from './components/DriverScorecard';
 
 import { INITIAL_ROUTES, INITIAL_STUDENTS, INITIAL_LOGS, MOCK_QUOTES, INITIAL_BUDGET_DATA, INITIAL_TICKETS } from './constants';
 import { BusRoute, Student, LogEntry, StudentStatus, BusStatus, SubscriptionTier, QuoteRequest, SystemSettings, MaintenanceTicket } from './types';
@@ -52,7 +31,7 @@ import { initSupabase } from './services/supabaseService';
 const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-            <h3 className="font-semibold text-slate-800">Live RFID Events</h3>
+            <h3 className="font-semibold text-slate-800">Live RFID & System Events</h3>
             <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Live Stream</span>
         </div>
         <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
@@ -65,6 +44,7 @@ const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
                     <div>
                         <p className={`text-sm ${log.severity === 'critical' ? 'text-red-700 font-bold' : 'text-slate-800'}`}>
                             {log.type === 'WRONG_BUS' && <span className="uppercase mr-1">[Safety Alert]</span>}
+                            {log.type === 'ALERT' && <span className="uppercase mr-1 text-orange-600">[Driver Alert]</span>}
                             {log.message}
                         </p>
                         <p className="text-xs text-slate-500 mt-1 font-mono">{log.timestamp}</p>
@@ -154,13 +134,6 @@ export default function App() {
 
   const handleNewQuote = (newQuote: QuoteRequest) => {
       setAdminQuotes(prev => [newQuote, ...prev]);
-      console.log(`
-        [EMAIL SENT]
-        To: matt.monjan@infusedu.com
-        Subject: New Quote Request - ${newQuote.districtName}
-        Body: A new quote for ${newQuote.amount.toLocaleString()} (Tier: ${newQuote.tier}) was generated for ${newQuote.contactName}.
-        Check Dashboard.
-      `);
   };
 
   // Effects
@@ -200,7 +173,7 @@ export default function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       setRoutes(currentRoutes => currentRoutes.map(bus => {
-        if (bus.status === BusStatus.MAINTENANCE) return bus;
+        if (bus.status === BusStatus.MAINTENANCE) return bus; // Don't move buses in maintenance
 
         let newCoords = bus.coordinates;
         if (bus.status === BusStatus.ON_ROUTE || bus.status === BusStatus.DELAYED) {
@@ -299,6 +272,7 @@ export default function App() {
           notes: []
       };
       setMaintenanceTickets(prev => [newTicket, ...prev]);
+      
       setRoutes(prev => prev.map(r => r.id === busId ? { ...r, status: BusStatus.MAINTENANCE, alert: undefined } : r));
       
       setLogs(prev => [{
@@ -316,6 +290,7 @@ export default function App() {
 
   const handleResolveTicket = (ticketId: string, busId: string) => {
       setRoutes(prev => prev.map(r => r.id === busId ? { ...r, status: BusStatus.IDLE } : r));
+      
       setLogs(prev => [{
           id: `L-RESOLVE-${Date.now()}`,
           timestamp: new Date().toLocaleTimeString(),
@@ -354,13 +329,28 @@ export default function App() {
       }
   };
 
-  const handleUpdateDriverStatus = (busId: string, status: BusStatus, alert?: string) => {
+  // CONNECT DRIVER APP TO ADMIN DASHBOARD LOGS
+  const handleUpdateDriverStatus = (busId: string, status: BusStatus, alertMsg?: string) => {
+      // 1. Update Fleet State
       setRoutes(prev => prev.map(r => {
           if (r.id === busId) {
-              return { ...r, status, alert };
+              return { ...r, status, alert: alertMsg };
           }
           return r;
       }));
+
+      // 2. Generate Dispatch Log for Admin View
+      const route = routes.find(r => r.id === busId);
+      if (route) {
+          const newLog: LogEntry = {
+              id: `L-DRIVER-${Date.now()}`,
+              timestamp: new Date().toLocaleTimeString(),
+              type: alertMsg ? 'ALERT' : 'SYSTEM',
+              message: alertMsg ? `Bus ${route.busNumber} Alert: ${alertMsg}` : `Bus ${route.busNumber} status updated to ${status}`,
+              severity: alertMsg ? (alertMsg.includes('EMERGENCY') ? 'critical' : 'warning') : 'info'
+          };
+          setLogs(prev => [newLog, ...prev].slice(0, 50)); 
+      }
   };
 
   if (!isLoggedIn) {
@@ -424,6 +414,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-slate-100 text-slate-900 font-sans animate-in fade-in duration-300">
+      {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 transition-all duration-300">
         <div className="p-6 flex items-center gap-3 border-b border-slate-800">
           <div className="bg-yellow-500 p-2 rounded-lg text-slate-900">
@@ -466,7 +457,7 @@ export default function App() {
                 <span className="font-medium">Special Events</span>
             </button>
           ) : (
-            <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed">
+            <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed" title="Upgrade to The Best Bus Plan">
                 <Calendar size={20} />
                 <span className="font-medium">Special Events</span>
                 <Lock size={12} className="ml-auto" />
@@ -482,7 +473,7 @@ export default function App() {
                 <span className="font-medium">Route Optimizer</span>
             </button>
           ) : (
-             <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed">
+             <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed" title="Upgrade to The Best Bus Plan">
                 <GitMerge size={20} />
                 <span className="font-medium">Optimizer</span>
                 <Lock size={12} className="ml-auto" />
@@ -501,7 +492,7 @@ export default function App() {
                     <span className="font-medium">Maintenance</span>
                 </button>
              ) : (
-                <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed">
+                <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed" title="Upgrade to The Better Bus Plan">
                     <Wrench size={20} />
                     <span className="font-medium">Maintenance</span>
                     <Lock size={12} className="ml-auto" />
@@ -517,7 +508,7 @@ export default function App() {
                     <span className="font-medium">Budget & Finance</span>
                 </button>
              ) : (
-                <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed">
+                <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed" title="Upgrade to The Best Bus Plan">
                     <DollarSign size={20} />
                     <span className="font-medium">Budget & Finance</span>
                     <Lock size={12} className="ml-auto" />
@@ -533,7 +524,7 @@ export default function App() {
                     <span className="font-medium">District Settings</span>
                 </button>
              ) : (
-                <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed">
+                <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed" title="Upgrade to The Better Bus Plan">
                     <Cable size={20} />
                     <span className="font-medium">District Settings</span>
                     <Lock size={12} className="ml-auto" />
@@ -549,7 +540,7 @@ export default function App() {
                     <span className="font-medium">Parent Portal</span>
                 </button>
              ) : (
-                <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed">
+                <div className="px-4 py-2 text-slate-600 flex items-center gap-3 opacity-50 cursor-not-allowed" title="Upgrade to The Better Bus Plan">
                     <Shield size={20} />
                     <span className="font-medium">Parent Portal</span>
                     <Lock size={12} className="ml-auto" />
@@ -782,7 +773,7 @@ export default function App() {
                     </>
                 )}
 
-                {/* ... rest of the tabs remain the same but just ensured they are correctly placed in the return */}
+                {/* ... Fleet Tab ... */}
                 {activeTab === 'fleet' && (
                     <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -803,96 +794,11 @@ export default function App() {
                             </div>
                         </div>
 
-                        {/* Fleet List Side Panel */}
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                             <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                                <h3 className="font-semibold text-slate-800">Fleet Management</h3>
-                                <button 
-                                    onClick={() => setShowFleetImport(true)}
-                                    className="text-xs bg-slate-800 text-white px-2 py-1.5 rounded hover:bg-slate-700 flex items-center gap-1 transition-colors"
-                                >
-                                    <Upload size={12} /> Import CSV
-                                </button>
-                            </div>
-                            <div className="overflow-y-auto p-4 space-y-3 custom-scrollbar flex-1">
-                                {routes.map(route => (
-                                    <div key={route.id} className={`p-4 border rounded-xl transition-all group relative ${
-                                        route.alert 
-                                            ? 'border-red-200 bg-red-50 shadow-md' 
-                                            : route.status === 'Maintenance'
-                                                ? 'border-orange-200 bg-orange-50'
-                                                : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-md'
-                                    }`}>
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div>
-                                                <h4 className="font-bold text-slate-800 flex items-center gap-2">
-                                                    {route.busNumber}
-                                                    {route.alert && (
-                                                        <span className="relative flex h-3 w-3">
-                                                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                                        </span>
-                                                    )}
-                                                </h4>
-                                                <p className="text-xs text-slate-500">{route.name}</p>
-                                                {route.vehicleType && (
-                                                    <span className="text-[10px] text-slate-400 uppercase font-medium tracking-wide border border-slate-200 rounded px-1 py-0.5 mt-1 inline-block">
-                                                        {route.vehicleType}
-                                                    </span>
-                                                )}
-                                            </div>
-                                             <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                                route.status === 'On Route' ? 'bg-green-100 text-green-700' :
-                                                route.status === 'Delayed' ? 'bg-red-100 text-red-700' :
-                                                route.status === 'Maintenance' ? 'bg-orange-100 text-orange-700' :
-                                                'bg-slate-100 text-slate-700'
-                                            }`}>
-                                                {route.status}
-                                            </span>
-                                        </div>
-                                        
-                                        {route.alert && (
-                                            <div className="mb-3 bg-white border border-red-100 rounded-lg p-3 shadow-sm animate-in slide-in-from-top-2">
-                                                <div className="flex items-start gap-2">
-                                                    <div className="text-red-500 mt-0.5 shrink-0">
-                                                        <AlertTriangle size={16} /> 
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-xs text-red-700 font-bold uppercase mb-1">Active Alert</p>
-                                                        <p className="text-sm text-slate-700 mb-2 leading-tight">{route.alert}</p>
-                                                        <button 
-                                                            onClick={() => handleDismissAlert(route.id)}
-                                                            className="w-full py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded transition-colors flex items-center justify-center gap-1 shadow-sm"
-                                                        >
-                                                            <Check size={12} /> Acknowledge & Dismiss
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {route.status === 'Maintenance' && (
-                                            <div className="mb-3 text-xs text-orange-700 bg-orange-100/50 p-2 rounded border border-orange-200">
-                                                See Maintenance Console for repair details.
-                                            </div>
-                                        )}
-                                        
-                                        <div className="flex items-center gap-2 text-sm text-slate-600 mb-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
-                                                <User size={12} />
-                                            </div>
-                                            {route.driver}
-                                        </div>
-
-                                        <button 
-                                            onClick={() => setEditingRoute(route)}
-                                            className="w-full py-2 border border-slate-200 bg-white rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <Pencil size={14} /> Edit Details
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                             {/* Adding the Driver Safety Scorecard Here */}
+                             <div className="h-full overflow-y-auto custom-scrollbar">
+                                <DriverScorecard routes={routes} />
+                             </div>
                         </div>
                     </div>
                 )}
@@ -985,7 +891,6 @@ export default function App() {
         </div>
       </main>
       
-      {/* Modals */}
       {selectedStudent && (
           <StudentDetailsModal 
             student={selectedStudent} 
@@ -1022,4 +927,3 @@ export default function App() {
     </div>
   );
 }
-// PASTE YOUR APP.TSX CODE HERE
