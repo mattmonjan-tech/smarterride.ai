@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Printer, Zap, Tablet, Server, Wifi, Globe, Download, Loader2, Trash2, Code, AlertTriangle } from 'lucide-react';
+import { X, Printer, Zap, Tablet, Server, Wifi, Globe, Download, Loader2, Trash2, Code, AlertTriangle, Cable, ShieldCheck, Smartphone } from 'lucide-react';
 import JSZip from 'jszip';
 import saveAs from 'file-saver';
 import { getProjectFiles } from '../services/rescueExport';
@@ -209,7 +209,7 @@ const InstallationGuide: React.FC<InstallationGuideProps> = ({ onClose, initialT
                             <p className="text-sm text-slate-500 mt-2">Use a heavy-duty RAM Mount to secure tablet to the right of the steering wheel. Ensure power is hardwired.</p>
                         </div>
                         <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 text-center">
-                            <Zap size={48} className="mx-auto mb-4 text-slate-400" />
+                            <Smartphone size={48} className="mx-auto mb-4 text-slate-400" />
                             <h3 className="font-bold text-slate-800">3. Kiosk Mode</h3>
                             <p className="text-sm text-slate-500 mt-2">Enable "Guided Access" (iOS) or "Pin App" (Android) to prevent drivers from exiting the application.</p>
                         </div>
