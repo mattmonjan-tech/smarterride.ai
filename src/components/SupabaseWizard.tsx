@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Copy, Check, Database, ArrowRight, Server } from 'lucide-react';
 
@@ -161,7 +160,7 @@ create policy "Public Access Tickets" on maintenance_tickets for all using (true
                 <div className="flex-1">
                     <h3 className="text-lg font-bold text-slate-800 mb-2">Connect App</h3>
                     <p className="text-slate-600 text-sm">
-                        Go to <strong>Project Settings > API</strong>. Copy the <code>Project URL</code> and <code>anon public key</code> and paste them into the RideSmart Infrastructure tab.
+                        Go to <strong>Project Settings &gt; API</strong>. Copy the <code>Project URL</code> and <code>anon public key</code> and paste them into the RideSmart Infrastructure tab.
                     </p>
                 </div>
             </div>
@@ -174,7 +173,7 @@ create policy "Public Access Tickets" on maintenance_tickets for all using (true
                 onClick={onClose}
                 className="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg"
             >
-                I've Run the Script <ArrowRight size={18} />
+                I&apos;ve Run the Script <ArrowRight size={18} />
             </button>
         </div>
       </div>
