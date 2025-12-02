@@ -31,7 +31,7 @@ import { initSupabase } from './services/supabaseService';
 const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-            <h3 className="font-semibold text-slate-800">Live RFID & System Events</h3>
+            <h3 className="font-semibold text-slate-800">Live RFID Events</h3>
             <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Live Stream</span>
         </div>
         <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
@@ -44,7 +44,6 @@ const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
                     <div>
                         <p className={`text-sm ${log.severity === 'critical' ? 'text-red-700 font-bold' : 'text-slate-800'}`}>
                             {log.type === 'WRONG_BUS' && <span className="uppercase mr-1">[Safety Alert]</span>}
-                            {log.type === 'ALERT' && <span className="uppercase mr-1 text-orange-600">[Driver Alert]</span>}
                             {log.message}
                         </p>
                         <p className="text-xs text-slate-500 mt-1 font-mono">{log.timestamp}</p>
@@ -60,6 +59,7 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'CLIENT' | 'ADMIN' | 'DRIVER' | 'MAINTENANCE'>('CLIENT');
   const [tier, setTier] = useState<SubscriptionTier>('ENTERPRISE');
+  const [activeTenantId, setActiveTenantId] = useState<string | null>(null);
 
   // Super Admin State (Lifted up with Persistence)
   const [adminQuotes, setAdminQuotes] = useState<QuoteRequest[]>(() => {
@@ -130,10 +130,24 @@ export default function App() {
       setTier(simulatedTier);
       setIsLoggedIn(true);
       setActiveTab('dashboard');
+      // If logging in directly as client/driver, set default tenant context
+      if (role !== 'ADMIN') {
+          setActiveTenantId('TUSD-882'); 
+      }
   };
 
   const handleNewQuote = (newQuote: QuoteRequest) => {
+      // 1. Update Super Admin State
       setAdminQuotes(prev => [newQuote, ...prev]);
+      
+      // 2. Simulate Email Notification to Matt Monjan
+      console.log(`
+        [EMAIL SENT]
+        To: matt.monjan@infusedu.com
+        Subject: New Quote Request - ${newQuote.districtName}
+        Body: A new quote for ${newQuote.amount.toLocaleString()} (Tier: ${newQuote.tier}) was generated for ${newQuote.contactName}.
+        Check Dashboard.
+      `);
   };
 
   // Effects
@@ -321,11 +335,11 @@ export default function App() {
       setRoutes(prev => [...prev, newRoute]);
   };
 
-  // Corrected impersonation logic
   const handleImpersonate = (tenantId: string) => {
-      console.log('Impersonating tenant:', tenantId);
-      setUserRole('CLIENT'); // Set role to CLIENT to show main dashboard
-      setActiveTab('dashboard'); // Reset view
+      // Mock Impersonation: Switch role to CLIENT and pretend we loaded their data
+      setUserRole('CLIENT');
+      setActiveTenantId(tenantId);
+      setActiveTab('dashboard');
   };
   
   const handleUpdateSystemSettings = (newSettings: SystemSettings) => {
@@ -454,6 +468,7 @@ export default function App() {
             <span className="font-medium">Students</span>
           </button>
           
+          {/* Feature: Special Events (Enterprise Only) */}
           {features.events ? (
             <button 
                 onClick={() => setActiveTab('events')}
@@ -470,6 +485,7 @@ export default function App() {
             </div>
           )}
 
+          {/* Feature: Optimizer (Enterprise Only) */}
           {features.optimizer ? (
             <button 
                 onClick={() => setActiveTab('optimizer')}
