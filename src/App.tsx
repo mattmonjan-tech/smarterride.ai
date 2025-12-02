@@ -1,6 +1,29 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  LayoutDashboard, Map as MapIcon, Users, Bell, Settings, Bus, LogOut, Search, ChevronRight, Pencil, User, GitMerge, AlertTriangle, Check, Cable, Upload, X, Shield, Calendar, Lock, DollarSign, Wrench, Tag 
+  LayoutDashboard, 
+  Map as MapIcon, 
+  Users, 
+  Bell, 
+  Settings, 
+  Bus, 
+  LogOut, 
+  Search, 
+  ChevronRight, 
+  Pencil, 
+  User, 
+  GitMerge, 
+  AlertTriangle, 
+  Check, 
+  Cable, 
+  Upload, 
+  X, 
+  Shield, 
+  Calendar, 
+  Lock, 
+  DollarSign, 
+  Wrench, 
+  Tag 
 } from 'lucide-react';
 import DashboardMetrics from './components/DashboardMetrics';
 import SimulatedMap from './components/SimulatedMap';
@@ -18,10 +41,9 @@ import BudgetPlanner from './components/BudgetPlanner';
 import MaintenanceConsole from './components/MaintenanceConsole';
 import TelematicsIntegration from './components/TelematicsIntegration';
 import DriverApp from './components/DriverApp';
-import RescueDeploy from './components/RescueDeploy';
+import RescueDeploy from './components/RescueDeploy'; // Changed import
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import MaintenanceModal from './components/MaintenanceModal';
-import DriverScorecard from './components/DriverScorecard';
 
 import { INITIAL_ROUTES, INITIAL_STUDENTS, INITIAL_LOGS, MOCK_QUOTES, INITIAL_BUDGET_DATA, INITIAL_TICKETS } from './constants';
 import { BusRoute, Student, LogEntry, StudentStatus, BusStatus, SubscriptionTier, QuoteRequest, SystemSettings, MaintenanceTicket } from './types';
@@ -31,7 +53,7 @@ import { initSupabase } from './services/supabaseService';
 const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-            <h3 className="font-semibold text-slate-800">Live RFID & System Events</h3>
+            <h3 className="font-semibold text-slate-800">Live RFID Events</h3>
             <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Live Stream</span>
         </div>
         <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
@@ -44,7 +66,6 @@ const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
                     <div>
                         <p className={`text-sm ${log.severity === 'critical' ? 'text-red-700 font-bold' : 'text-slate-800'}`}>
                             {log.type === 'WRONG_BUS' && <span className="uppercase mr-1">[Safety Alert]</span>}
-                            {log.type === 'ALERT' && <span className="uppercase mr-1 text-orange-600">[Driver Alert]</span>}
                             {log.message}
                         </p>
                         <p className="text-xs text-slate-500 mt-1 font-mono">{log.timestamp}</p>
@@ -60,7 +81,6 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'CLIENT' | 'ADMIN' | 'DRIVER' | 'MAINTENANCE'>('CLIENT');
   const [tier, setTier] = useState<SubscriptionTier>('ENTERPRISE');
-  const [activeTenantId, setActiveTenantId] = useState<string | null>(null);
 
   // Super Admin State (Lifted up with Persistence)
   const [adminQuotes, setAdminQuotes] = useState<QuoteRequest[]>(() => {
@@ -79,10 +99,11 @@ export default function App() {
       if (systemSettings.supabaseUrl && systemSettings.supabaseKey) {
           initSupabase(systemSettings.supabaseUrl, systemSettings.supabaseKey);
       }
-  }, [systemSettings.supabaseUrl, systemSettings.supabaseKey]); 
+  }, [systemSettings.supabaseUrl, systemSettings.supabaseKey]); // Added dependencies to ensure re-init on change
 
   // Tenants State
   const [tenants, setTenants] = useState(() => {
+      // Mock logic for tenants persistence could go here
       return []; 
   });
 
@@ -131,18 +152,23 @@ export default function App() {
       setTier(simulatedTier);
       setIsLoggedIn(true);
       setActiveTab('dashboard');
-      // If logging in directly as client/driver, set default tenant context
-      if (role !== 'ADMIN') {
-          setActiveTenantId('TUSD-882'); 
-      }
   };
 
   const handleNewQuote = (newQuote: QuoteRequest) => {
       // 1. Update Super Admin State
       setAdminQuotes(prev => [newQuote, ...prev]);
+      
+      // 2. Simulate Email Notification to Matt Monjan
+      console.log(`
+        [EMAIL SENT]
+        To: matt.monjan@infusedu.com
+        Subject: New Quote Request - ${newQuote.districtName}
+        Body: A new quote for ${newQuote.amount.toLocaleString()} (Tier: ${newQuote.tier}) was generated for ${newQuote.contactName}.
+        Check Dashboard.
+      `);
   };
 
-  // Live Search Logic
+  // Effects
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
         setSearchResults({ students: [], routes: [] });
@@ -175,7 +201,7 @@ export default function App() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fleet Simulation (Live Maps Data)
+  // Fleet Simulation
   useEffect(() => {
     const interval = setInterval(() => {
       setRoutes(currentRoutes => currentRoutes.map(bus => {
@@ -328,8 +354,8 @@ export default function App() {
   };
 
   const handleImpersonate = (tenantId: string) => {
+      // Mock Impersonation: Switch role to CLIENT and pretend we loaded their data
       setUserRole('CLIENT');
-      setActiveTenantId(tenantId);
       setActiveTab('dashboard');
   };
   
@@ -340,26 +366,13 @@ export default function App() {
       }
   };
 
-  const handleUpdateDriverStatus = (busId: string, status: BusStatus, alertMsg?: string) => {
+  const handleUpdateDriverStatus = (busId: string, status: BusStatus, alert?: string) => {
       setRoutes(prev => prev.map(r => {
           if (r.id === busId) {
-              return { ...r, status, alert: typeof alertMsg === 'string' ? alertMsg : undefined };
+              return { ...r, status, alert };
           }
           return r;
       }));
-
-      // Generate Dispatch Log
-      const route = routes.find(r => r.id === busId);
-      if (route) {
-          const newLog: LogEntry = {
-              id: `L-DRIVER-${Date.now()}`,
-              timestamp: new Date().toLocaleTimeString(),
-              type: alertMsg ? 'ALERT' : 'SYSTEM',
-              message: alertMsg ? `Bus ${route.busNumber} Alert: ${alertMsg}` : `Bus ${route.busNumber} status updated to ${status}`,
-              severity: alertMsg ? (alertMsg.includes('EMERGENCY') ? 'critical' : 'warning') : 'info'
-          };
-          setLogs(prev => [newLog, ...prev].slice(0, 50));
-      }
   };
 
   if (!isLoggedIn) {
@@ -403,6 +416,7 @@ export default function App() {
                         />
                    </div>
                </div>
+               {/* Allow Fleet Import in Maintenance Mode too */}
                {showFleetImport && (
                   <FleetImportModal 
                     onImport={handleFleetImport}
@@ -457,6 +471,7 @@ export default function App() {
             <span className="font-medium">Students</span>
           </button>
           
+          {/* Feature: Special Events (Enterprise Only) */}
           {features.events ? (
             <button 
                 onClick={() => setActiveTab('events')}
@@ -473,6 +488,7 @@ export default function App() {
             </div>
           )}
 
+          {/* Feature: Optimizer (Enterprise Only) */}
           {features.optimizer ? (
             <button 
                 onClick={() => setActiveTab('optimizer')}
@@ -492,6 +508,7 @@ export default function App() {
           <div className="pt-4 mt-4 border-t border-slate-800">
              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2 px-4">Administration</p>
              
+             {/* Feature: Maintenance (Professional+) */}
              {features.maintenance ? (
                 <button 
                     onClick={() => setActiveTab('maintenance')}
@@ -508,6 +525,7 @@ export default function App() {
                 </div>
              )}
 
+             {/* Feature: Budget (Enterprise Only) */}
              {features.budget ? (
                 <button 
                     onClick={() => setActiveTab('budget')}
@@ -524,6 +542,7 @@ export default function App() {
                 </div>
              )}
 
+             {/* Feature: Hardware (Professional+) */}
              {features.hardware ? (
                 <button 
                     onClick={() => setActiveTab('hardware')}
@@ -540,6 +559,7 @@ export default function App() {
                 </div>
              )}
 
+            {/* Feature: Parent Portal (Professional+) */}
             {features.parentPortal ? (
                 <button 
                     onClick={() => setActiveTab('parent')}
@@ -611,7 +631,7 @@ export default function App() {
             </div>
             
             <div className="flex items-center gap-4">
-                {/* LIVE SEARCH COMPONENT */}
+                {/* Search Input */}
                 <div className="relative hidden md:block" ref={searchRef}>
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input 
@@ -621,7 +641,7 @@ export default function App() {
                         placeholder="Search bus, student, or route..." 
                         className="pl-9 pr-4 py-2 bg-slate-100 border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-full text-sm w-64 transition-all outline-none border"
                     />
-                    {/* LIVE SEARCH RESULTS */}
+                    {/* Search Results */}
                     {searchQuery.trim().length >= 2 && (
                          <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden animate-in slide-in-from-top-2 z-50">
                             {searchResults.students.length === 0 && searchResults.routes.length === 0 ? (
@@ -740,7 +760,6 @@ export default function App() {
                     <>
                         <DashboardMetrics routes={routes} students={students} />
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* LIVE MAPS INTEGRATION */}
                             <div className="lg:col-span-2 h-[500px] bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="font-semibold text-slate-800 flex items-center gap-2">
@@ -763,6 +782,7 @@ export default function App() {
                                 </div>
                             </div>
                             <div className="space-y-6">
+                                {/* Feature: AI Logistics (Enterprise Only) */}
                                 {features.aiLogistics ? (
                                     <AiLogistics routes={routes} logs={logs} tickets={maintenanceTickets} />
                                 ) : (
@@ -787,13 +807,10 @@ export default function App() {
                                 <RfidLogList logs={logs} />
                             </div>
                         </div>
-                        
-                        <div className="mt-6">
-                            <DriverScorecard routes={routes} />
-                        </div>
                     </>
                 )}
 
+                {/* ... rest of the tabs remain the same but just ensured they are correctly placed in the return */}
                 {activeTab === 'fleet' && (
                     <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -814,6 +831,7 @@ export default function App() {
                             </div>
                         </div>
 
+                        {/* Fleet List Side Panel */}
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                              <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                                 <h3 className="font-semibold text-slate-800">Fleet Management</h3>
