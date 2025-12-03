@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import SimulatedMap, { RoadDefinition } from './SimulatedMap';
 import { BusRoute, OptimizationInsight } from '../types';
