@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, User, Bus, ChevronRight, Loader2 } from 'lucide-react';
 import { Student, BusRoute } from '../types';
