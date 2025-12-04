@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { BusRoute, BusStatus } from '../types';
-import { X, Calendar, MapPin, Bus, User } from 'lucide-react';
+import { X, Calendar, MapPin, Bus, User, Flag } from 'lucide-react';
 
 interface CreateEventModalProps {
   onSave: (newRoute: BusRoute) => void;
@@ -27,7 +28,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ onSave, onClose }) 
       occupancy: 0,
       nextStop: destination,
       estimatedArrival: '10:00',
-      coordinates: { x: 50, y: 50 },
+      coordinates: { x: 50, y: 50 }, // Default center start
       type: eventType,
       destination: destination,
       eventDate: date,
