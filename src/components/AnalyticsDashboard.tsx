@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { BusRoute } from '../types';
@@ -9,7 +8,6 @@ interface AnalyticsDashboardProps {
 }
 
 const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ routes }) => {
-    // Mock Data for Charts
     const savingsData = [
         { month: 'Jan', Savings: 4000 },
         { month: 'Feb', Savings: 3000 },
