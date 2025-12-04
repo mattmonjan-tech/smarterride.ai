@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { BusRoute, BusStatus } from '../types';
-import { X, Calendar, MapPin, Bus, User, Flag } from 'lucide-react';
+import { X, Calendar, MapPin, Bus, User } from 'lucide-react';
 
 interface CreateEventModalProps {
   onSave: (newRoute: BusRoute) => void;
