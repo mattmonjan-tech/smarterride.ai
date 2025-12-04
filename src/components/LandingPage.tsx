@@ -230,7 +230,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
           busCount: busCount,
           legacyBusCount: legacyCount,
           tier: quoteForm.tier,
-          amount: grandTotal, // Total value of the deal
+          amount: grandTotal,
           hardwareCost: hardwareTotal,
           status: 'PENDING',
           submittedDate: new Date().toLocaleDateString()
@@ -395,11 +395,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
               Replace paper manifests with AI-powered logistics. RideSmart provides real-time RFID tracking, automated parent notifications, and route optimization for modern school districts.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button onClick={() => setShowQuoteModal(true)} className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
-                Request Pricing <ArrowRight size={18} />
+              {/* UPDATED: Open Login Modal instead of direct Admin Login */}
+              <button onClick={() => setShowLoginModal(true)} className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                Launch Dashboard <ArrowRight size={18} />
               </button>
-              <button onClick={() => setShowHardwareModal(true)} className="px-8 py-4 bg-white text-slate-700 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
-                View Hardware Guide
+              <button onClick={() => setShowQuoteModal(true)} className="px-8 py-4 bg-white text-slate-700 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                Request Pricing
               </button>
             </div>
             <div className="pt-8 flex items-center gap-6 text-sm text-slate-500 font-medium">
@@ -408,6 +409,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
             </div>
           </div>
           
+          {/* Hero Graphic */}
           <div className="w-full">
              <InteractiveHeroDemo />
           </div>
@@ -553,6 +555,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
       {showEmailPreview && generatedQuote && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
               <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-300">
+                  {/* Mock Email Window Header */}
                   <div className="bg-slate-100 border-b border-slate-300 p-3 flex items-center justify-between">
                       <div className="flex gap-2">
                           <div className="w-3 h-3 rounded-full bg-red-400"></div>
@@ -565,13 +568,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                       </button>
                   </div>
                   
+                  {/* Mock Email Body */}
                   <div className="p-8 bg-white">
                       <div className="border-b border-slate-100 pb-6 mb-6">
                           <h2 className="text-xl font-bold text-slate-900 mb-2">New Quote Request: {generatedQuote.districtName}</h2>
                           <div className="flex items-center gap-3">
                               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">RS</div>
                               <div>
-                                  <p className="text-sm font-bold text-slate-800">RideSmart Auto-Mailer <span className="font-normal text-slate-500">&lt;noreply@ridesmart.ai&gt;</span></p>
+                                  <p className="text-sm font-bold text-slate-800">RideSmart Auto-Mailer (noreply@ridesmart.ai)</p>
                                   <p className="text-xs text-slate-400">To: {quoteForm.email}</p>
                                   <p className="text-xs text-slate-400">BCC: matt.monjan@infusedu.com</p>
                               </div>
@@ -623,6 +627,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                   <div className="p-6 overflow-y-auto custom-scrollbar">
                       {!generatedQuote ? (
                           <form onSubmit={handleQuoteSubmit} className="space-y-4">
+                              {/* Contact Info */}
                               <div>
                                   <label className="block text-sm font-bold text-slate-700 mb-1">District Name</label>
                                   <input required type="text" className="w-full border border-slate-300 rounded-lg p-2 text-sm" 
@@ -653,6 +658,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                     value={quoteForm.email} onChange={e => setQuoteForm({...quoteForm, email: e.target.value})} />
                               </div>
 
+                              {/* Plan Selection */}
                               <div>
                                   <label className="block text-sm font-bold text-slate-700 mb-1">Select Plan</label>
                                   <select required className="w-full border border-slate-300 rounded-lg p-2 text-sm bg-white"
@@ -663,6 +669,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                   </select>
                               </div>
 
+                              {/* Metrics */}
                               <div className="grid grid-cols-2 gap-4">
                                   <div>
                                       <label className="block text-sm font-bold text-slate-700 mb-1">Total Students</label>
@@ -676,6 +683,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                   </div>
                               </div>
                               
+                              {/* Hardware Retrofit Question */}
                               <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
                                   <label className="block text-sm font-bold text-slate-800 mb-1">Pre-2015 Buses (Legacy)</label>
                                   <p className="text-xs text-slate-500 mb-2">These vehicles require a hardware retrofit kit (USB/Dongle) for connectivity.</p>
@@ -698,6 +706,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                       ) : (
                           <div className="animate-in fade-in slide-in-from-bottom-4">
                               <div id="quote-document" className="bg-white p-8 border border-slate-200 shadow-sm mb-6 font-poppins text-slate-800">
+                                  {/* Invoice Header */}
                                   <div className="flex justify-between items-start mb-8 border-b-2 border-slate-900 pb-6">
                                       <div>
                                           <div className="flex items-center gap-2 text-blue-600 mb-2">
@@ -713,6 +722,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                       </div>
                                   </div>
 
+                                  {/* Client Info */}
                                   <div className="mb-8">
                                       <p className="text-xs font-bold text-slate-400 uppercase mb-1">Prepared For</p>
                                       <p className="font-bold text-lg">{generatedQuote.districtName}</p>
@@ -720,6 +730,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                       <p className="text-sm text-slate-500">{generatedQuote.email}</p>
                                   </div>
 
+                                  {/* Line Items */}
                                   <table className="w-full mb-8">
                                       <thead>
                                           <tr className="border-b border-slate-200 text-left text-xs font-bold text-slate-500 uppercase">
@@ -768,6 +779,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                       </tbody>
                                   </table>
 
+                                  {/* Total */}
                                   <div className="flex justify-end border-t-2 border-slate-900 pt-4">
                                       <div className="text-right">
                                           <p className="text-sm font-bold text-slate-500 uppercase">Total Estimate</p>
@@ -844,10 +856,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
           </div>
       )}
 
-      {/* Login Modal */}
+      {/* Login Modal - Multi Tab */}
       {showLoginModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
               <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                  {/* Header */}
                   <div className="bg-slate-900 p-6 text-center relative">
                       <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-600/50">
                           <Bus size={32} className="text-white" />
@@ -857,13 +870,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                       <button onClick={() => setShowLoginModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X size={20}/></button>
                   </div>
                   
+                  {/* Tabs */}
                   <div className="flex border-b border-slate-200">
-                      <button onClick={() => setLoginTab('OFFICE')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === 'OFFICE' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Office</button>
-                      <button onClick={() => setLoginTab('DRIVER')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === 'DRIVER' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Driver</button>
-                      <button onClick={() => setLoginTab('SHOP')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === 'SHOP' ? 'border-orange-500 text-orange-600 bg-orange-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Shop</button>
-                      <button onClick={() => setLoginTab('ADMIN')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === 'ADMIN' ? 'border-red-600 text-red-600 bg-red-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Admin</button>
+                      <button 
+                        onClick={() => setLoginTab('OFFICE')}
+                        className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === 'OFFICE' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                      >
+                          Office
+                      </button>
+                      <button 
+                        onClick={() => setLoginTab('DRIVER')}
+                        className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === 'DRIVER' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                      >
+                          Driver
+                      </button>
+                      <button 
+                        onClick={() => setLoginTab('SHOP')}
+                        className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === 'SHOP' ? 'border-orange-500 text-orange-600 bg-orange-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                      >
+                          Shop
+                      </button>
+                      <button 
+                        onClick={() => setLoginTab('ADMIN')}
+                        className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === 'ADMIN' ? 'border-red-600 text-red-600 bg-red-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                      >
+                          Admin
+                      </button>
                   </div>
 
+                  {/* Body */}
                   <div className="p-8">
                       <div className="space-y-4">
                           {loginTab === 'OFFICE' && (
@@ -899,7 +934,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
 
                           {loginTab === 'DRIVER' && (
                               <div className="text-center py-4">
-                                  <p className="text-sm text-slate-600 mb-4">Launch the simplified Driver App interface designed for in-vehicle tablets.</p>
+                                  <p className="text-sm text-slate-600 mb-4">
+                                      Launch the simplified Driver App interface designed for in-vehicle tablets.
+                                  </p>
                                   <div className="bg-slate-100 p-4 rounded-lg border border-slate-200 inline-block">
                                       <Tablet size={48} className="mx-auto text-slate-400 mb-2" />
                                       <p className="text-xs font-bold text-slate-500 uppercase">Kiosk Mode Ready</p>
@@ -909,12 +946,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
 
                           {loginTab === 'SHOP' && (
                               <div className="text-center py-4">
-                                  <p className="text-sm text-slate-600 mb-4">Access the Maintenance Console to view work orders and update vehicle status.</p>
+                                  <p className="text-sm text-slate-600 mb-4">
+                                      Access the Maintenance Console to view work orders and update vehicle status.
+                                  </p>
                                   <div className="bg-orange-50 p-4 rounded-lg border border-orange-100 inline-block mb-4">
                                       <Wrench size={48} className="mx-auto text-orange-500 mb-2" />
                                       <p className="text-xs font-bold text-orange-600 uppercase">Mechanic Portal</p>
                                   </div>
-                                  <input type="text" placeholder="Enter Mechanic ID" className="w-full px-4 py-3 border border-slate-300 rounded-lg outline-none focus:border-orange-500 text-center" />
+                                  <input 
+                                    type="text" 
+                                    placeholder="Enter Mechanic ID" 
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-lg outline-none focus:border-orange-500 text-center"
+                                  />
                               </div>
                           )}
 
@@ -924,7 +967,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                       <Shield size={48} className="mx-auto text-red-500 mb-2" />
                                       <p className="text-xs font-bold text-red-600 uppercase">Super Admin Console</p>
                                   </div>
-                                  <input type="password" placeholder="Enter Master Key" className="w-full px-4 py-3 border border-slate-300 rounded-lg outline-none focus:border-red-500 text-center mb-4" />
+                                  <input 
+                                    type="password" 
+                                    placeholder="Enter Master Key" 
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-lg outline-none focus:border-red-500 text-center mb-4"
+                                  />
                                   <p className="text-xs text-slate-500 mb-4">Restricted access for RideSmart Controller only.</p>
                               </div>
                           )}
@@ -943,6 +990,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                'Sign In to Dashboard'}
                           </button>
 
+                           {/* Global Bypass Link (Always visible in footer) */}
                            <div className="text-center pt-4 border-t border-slate-100 mt-4">
                                 <button 
                                     onClick={() => {
@@ -960,7 +1008,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
           </div>
       )}
 
-      {/* Hardware Guide Modal */}
+      {/* Hardware Guide Modal (Simple Viewer) */}
       {showHardwareModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
               <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden">
