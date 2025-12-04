@@ -14,18 +14,15 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ initialData }) => {
   const [insights, setInsights] = useState<FinancialInsight[]>([]);
   const [loadingAi, setLoadingAi] = useState(false);
 
-  // Ledger Form State
   const [newCategory, setNewCategory] = useState<BudgetCategory>('Fuel/Gas');
   const [newAmount, setNewAmount] = useState('');
   const [newYear, setNewYear] = useState(new Date().getFullYear());
   const [newDesc, setNewDesc] = useState('');
 
-  // Simulator State
-  const [efficiencyRate, setEfficiencyRate] = useState(10); // 10% route efficiency improvement
-  const [evAdoption, setEvAdoption] = useState(0); // 0% EV fleet
-  const [maintenanceOpt, setMaintenanceOpt] = useState(5); // 5% maintenance saving
+  const [efficiencyRate, setEfficiencyRate] = useState(10); 
+  const [evAdoption, setEvAdoption] = useState(0);
+  const [maintenanceOpt, setMaintenanceOpt] = useState(5);
 
-  // Aggregation Logic
   const years: number[] = Array.from<number>(new Set(entries.map(e => e.fiscalYear))).sort((a, b) => a - b);
   const latestFiscalYear = years.length > 0 ? years[years.length - 1] : new Date().getFullYear();
   
@@ -69,19 +66,15 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ initialData }) => {
       setLoadingAi(false);
   };
 
-  const COLORS = ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#6366f1'];
-
-  // Simulator Calculations
   const currentFuel = entries.filter(e => e.fiscalYear === latestFiscalYear && e.category === 'Fuel/Gas').reduce((sum, e) => sum + e.amount, 0);
   const currentMaint = entries.filter(e => e.fiscalYear === latestFiscalYear && e.category === 'Maintenance').reduce((sum, e) => sum + e.amount, 0);
   
-  const fuelSavings = (currentFuel * (efficiencyRate / 100)) + (currentFuel * (evAdoption / 100) * 0.6); // EV reduces fuel cost by ~60% relative to adoption
+  const fuelSavings = (currentFuel * (efficiencyRate / 100)) + (currentFuel * (evAdoption / 100) * 0.6);
   const maintSavings = currentMaint * (maintenanceOpt / 100);
   const totalProjectedSavings = fuelSavings + maintSavings;
 
   return (
     <div className="h-full flex flex-col gap-6">
-        {/* Header */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
             <div>
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
@@ -99,7 +92,6 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ initialData }) => {
         <div className="flex-1 overflow-y-auto custom-scrollbar">
             {activeTab === 'overview' && (
                 <div className="space-y-6">
-                    {/* Key Metrics */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                             <p className="text-slate-500 text-xs font-bold uppercase mb-2">Current Year Spend</p>
@@ -127,7 +119,6 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ initialData }) => {
                         </div>
                     </div>
 
-                    {/* Charts */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-96">
                             <h3 className="font-bold text-slate-800 mb-4">Year over Year Comparison</h3>
