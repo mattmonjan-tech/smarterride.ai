@@ -659,7 +659,7 @@ export default function App() {
                                     </button>
                                 </div>
                                 <div className="flex-1 relative rounded-lg overflow-hidden border border-slate-100">
-                                    {/* UPDATED LIVE MAP - REMOVED INVALID PROPS */}
+                                    {/* UPDATED LIVE MAP */}
                                     <LiveMap 
                                         routes={routes} 
                                         onDismissAlert={handleDismissAlert} 
@@ -701,7 +701,6 @@ export default function App() {
                     </>
                 )}
 
-                {/* ... rest of the tabs remain the same but just ensured they are correctly placed in the return */}
                 {activeTab === 'fleet' && (
                     <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
