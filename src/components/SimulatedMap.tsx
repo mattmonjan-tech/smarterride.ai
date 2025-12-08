@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { BusRoute, BusStatus, OptimizationInsight } from '../types';
 import { Bus, MapPin, AlertTriangle, X, Navigation, Clock, CheckCircle2, Sparkles, Loader2, Wrench } from 'lucide-react';
