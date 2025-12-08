@@ -29,6 +29,18 @@ import { INITIAL_ROUTES, INITIAL_STUDENTS, INITIAL_LOGS, MOCK_QUOTES, INITIAL_BU
 import { BusRoute, Student, LogEntry, StudentStatus, BusStatus, SubscriptionTier, QuoteRequest, SystemSettings, MaintenanceTicket } from './types';
 import { initSupabase } from './services/supabaseService';
 
+// Helper for safe parsing
+const safeJSONParse = <T,>(key: string, fallback: T): T => {
+  try {
+    const saved = localStorage.getItem(key);
+    if (!saved || saved === 'undefined' || saved === 'null') return fallback;
+    return JSON.parse(saved);
+  } catch (e) {
+    console.warn(`Failed to parse ${key} from localStorage, using fallback.`, e);
+    return fallback;
+  }
+};
+
 // RfidLogList Component
 const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -64,16 +76,14 @@ export default function App() {
   const [activeTenantId, setActiveTenantId] = useState<string | null>(null);
 
   // Super Admin State (Lifted up with Persistence)
-  const [adminQuotes, setAdminQuotes] = useState<QuoteRequest[]>(() => {
-      const saved = localStorage.getItem('rideSmartQuotes');
-      return saved ? JSON.parse(saved) : MOCK_QUOTES;
-  });
+  const [adminQuotes, setAdminQuotes] = useState<QuoteRequest[]>(() => 
+    safeJSONParse('rideSmartQuotes', MOCK_QUOTES)
+  );
 
   // System Settings State
-  const [systemSettings, setSystemSettings] = useState<SystemSettings>(() => {
-      const saved = localStorage.getItem('rideSmartSettings');
-      return saved ? JSON.parse(saved) : { mapProvider: 'SIMULATED' };
-  });
+  const [systemSettings, setSystemSettings] = useState<SystemSettings>(() => 
+    safeJSONParse('rideSmartSettings', { mapProvider: 'SIMULATED' })
+  );
 
   // Initialize Supabase on load if settings exist, and whenever settings change
   useEffect(() => {
@@ -101,7 +111,7 @@ export default function App() {
   const [showFleetImport, setShowFleetImport] = useState(false);
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
   
-  // Notification State (Search moved to LiveSearch component)
+  // Notification State
   const [showNotifications, setShowNotifications] = useState(false);
   
   // Mock State
