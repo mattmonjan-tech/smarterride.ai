@@ -1,14 +1,30 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { BusRoute, LogEntry, AiInsight, RouteOptimizationResponse, BudgetEntry, FinancialInsight, MaintenanceTicket } from "../types";
 
-const apiKey = process.env.API_KEY || '';
+// Helper to safely get env var
+const getApiKey = () => {
+  try {
+    // @ts-ignore
+    return process.env.API_KEY || process.env.VITE_API_KEY || '';
+  } catch (e) {
+    return '';
+  }
+};
 
-// Lazy initialization pattern to prevent crashes if API key is missing at startup
+// Lazy initialization wrapper
 let aiClient: GoogleGenAI | null = null;
 
 const getAiClient = () => {
-    if (!aiClient && apiKey) {
-        aiClient = new GoogleGenAI({ apiKey });
+    const key = getApiKey();
+    if (!key) return null;
+    
+    if (!aiClient) {
+        try {
+            aiClient = new GoogleGenAI({ apiKey: key });
+        } catch (e) {
+            console.error("Failed to initialize Gemini Client:", e);
+            return null;
+        }
     }
     return aiClient;
 };
