@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   LayoutDashboard, Map as MapIcon, Users, Bell, Settings, Bus, LogOut, Search, ChevronRight, Pencil, User, GitMerge, AlertTriangle, Check, Cable, Upload, X, Shield, Calendar, Lock, DollarSign, Wrench, Tag 
@@ -582,6 +581,7 @@ export default function App() {
             </div>
             
             <div className="flex items-center gap-4">
+                {/* UPDATED LIVE SEARCH */}
                 <LiveSearch 
                     students={students}
                     routes={routes}
@@ -669,6 +669,7 @@ export default function App() {
                                     </button>
                                 </div>
                                 <div className="flex-1 relative rounded-lg overflow-hidden border border-slate-100">
+                                    {/* UPDATED LIVE MAP */}
                                     <LiveMap 
                                         routes={routes} 
                                         onDismissAlert={handleDismissAlert} 
@@ -720,6 +721,7 @@ export default function App() {
                                  </div>
                             </div>
                             <div className="flex-1 min-h-[400px] p-4">
+                                    {/* UPDATED LIVE MAP */}
                                     <LiveMap 
                                         routes={routes} 
                                         onDismissAlert={handleDismissAlert} 
