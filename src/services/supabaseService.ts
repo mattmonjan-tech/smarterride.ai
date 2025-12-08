@@ -1,11 +1,13 @@
-
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { BusRoute, Student, MaintenanceTicket, BudgetEntry } from '../types';
 
 let supabase: SupabaseClient | null = null;
 
 export const initSupabase = (url: string, key: string) => {
-    if (!url || !key) return null;
+    if (!url || !key || url.length < 5 || key.length < 5) {
+        console.warn("Skipping Supabase Init: Invalid credentials.");
+        return null;
+    }
     try {
         supabase = createClient(url, key);
         console.log("Supabase client initialized");
