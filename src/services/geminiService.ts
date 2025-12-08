@@ -2,11 +2,20 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { BusRoute, LogEntry, AiInsight, RouteOptimizationResponse, BudgetEntry, FinancialInsight, MaintenanceTicket } from "../types";
 
 const apiKey = process.env.API_KEY || '';
-// Using the new GoogleGenAI class as per guidelines
-const ai = new GoogleGenAI({ apiKey });
+
+// Lazy initialization pattern to prevent crashes if API key is missing at startup
+let aiClient: GoogleGenAI | null = null;
+
+const getAiClient = () => {
+    if (!aiClient && apiKey) {
+        aiClient = new GoogleGenAI({ apiKey });
+    }
+    return aiClient;
+};
 
 export const analyzeLogistics = async (routes: BusRoute[], logs: LogEntry[], tickets: MaintenanceTicket[] = []): Promise<AiInsight[]> => {
-  if (!apiKey) {
+  const ai = getAiClient();
+  if (!ai) {
     console.warn("No API Key provided for Gemini.");
     return [
       {
@@ -15,7 +24,7 @@ export const analyzeLogistics = async (routes: BusRoute[], logs: LogEntry[], tic
         type: "system",
         confidence: 0
       }
-    ] as any; // Fallback
+    ] as any;
   }
 
   try {
@@ -77,7 +86,8 @@ export const analyzeLogistics = async (routes: BusRoute[], logs: LogEntry[], tic
 };
 
 export const generateRouteOptimizations = async (routes: BusRoute[]): Promise<RouteOptimizationResponse> => {
-  if (!apiKey) {
+  const ai = getAiClient();
+  if (!ai) {
     return {
       overview: "API Key Missing",
       insights: [],
@@ -141,7 +151,8 @@ export const generateRouteOptimizations = async (routes: BusRoute[]): Promise<Ro
 };
 
 export const draftParentCommunication = async (topic: string, busId: string): Promise<string> => {
-  if (!apiKey) return "API Key missing. Cannot generate draft.";
+  const ai = getAiClient();
+  if (!ai) return "API Key missing. Cannot generate draft.";
 
   try {
     const prompt = `
@@ -167,7 +178,8 @@ export const draftParentCommunication = async (topic: string, busId: string): Pr
 };
 
 export const analyzeBudget = async (budgetEntries: BudgetEntry[]): Promise<FinancialInsight[]> => {
-  if (!apiKey) return [];
+  const ai = getAiClient();
+  if (!ai) return [];
 
   try {
     const prompt = `
