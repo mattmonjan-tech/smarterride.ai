@@ -3,10 +3,10 @@ import {
   LayoutDashboard, Map as MapIcon, Users, Bell, Settings, Bus, LogOut, Search, ChevronRight, Pencil, User, GitMerge, AlertTriangle, Check, Cable, Upload, X, Shield, Calendar, Lock, DollarSign, Wrench, Tag 
 } from 'lucide-react';
 
-// Explicit relative imports to fix resolution errors
+// Using relative paths for maximum compatibility
 import DashboardMetrics from './components/DashboardMetrics';
 import SimulatedMap from './components/SimulatedMap';
-import LiveMap from './components/LiveMap';
+import FleetMapComponent from './components/LiveMap';
 import LiveSearch from './components/LiveSearch';
 import AiLogistics from './components/AiLogistics';
 import StudentDetailsModal from './components/StudentDetailsModal';
@@ -70,6 +70,11 @@ const RfidLogList: React.FC<{ logs: LogEntry[] }> = ({ logs }) => (
 );
 
 export default function App() {
+  // DEBUG: Confirm new version is running
+  useEffect(() => {
+    console.log("RideSmart App - Version 71.0.0 - Alias Config Restored");
+  }, []);
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'CLIENT' | 'ADMIN' | 'DRIVER' | 'MAINTENANCE'>('CLIENT');
   const [tier, setTier] = useState<SubscriptionTier>('ENTERPRISE');
@@ -660,7 +665,7 @@ export default function App() {
                                 </div>
                                 <div className="flex-1 relative rounded-lg overflow-hidden border border-slate-100">
                                     {/* UPDATED LIVE MAP */}
-                                    <LiveMap 
+                                    <FleetMapComponent 
                                         routes={routes} 
                                         onDismissAlert={handleDismissAlert} 
                                         onReportIssue={handleReportMechanicalIssue}
@@ -712,7 +717,7 @@ export default function App() {
                             </div>
                             <div className="flex-1 min-h-[400px] p-4">
                                     {/* UPDATED LIVE MAP */}
-                                    <LiveMap 
+                                    <FleetMapComponent 
                                         routes={routes} 
                                         onDismissAlert={handleDismissAlert} 
                                         onReportIssue={handleReportMechanicalIssue}
@@ -938,8 +943,3 @@ export default function App() {
     </div>
   );
 }
-
-// ----------------------------------------------------------------------
-// Package bump
-// ----------------------------------------------------------------------
-// Force update version
