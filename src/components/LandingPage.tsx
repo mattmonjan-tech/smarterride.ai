@@ -27,6 +27,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
         role: '',
         email: '',
         students: '',
+        role: '',
+        email: '',
+        students: '',
         newBuses: '',
         oldBuses: '',
         tier: 'PROFESSIONAL' as SubscriptionTier
@@ -80,6 +83,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
             contactName: quoteForm.contact,
             contactRole: quoteForm.role,
             email: quoteForm.email,
+            studentCount: parseInt(quoteForm.students) || 0,
+            busCount: busCount,
             studentCount: parseInt(quoteForm.students) || 0,
             busCount: busCount,
             newBusCount: newBusCount,
@@ -296,13 +301,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                                     <div className="bg-blue-600 p-2 rounded-lg text-white"><Bus size={24} /></div>
                                                     <span className="text-xl font-bold tracking-tight text-slate-900">RideSmart<span className="text-blue-600">.ai</span></span>
                                                 </div>
-                                                <p className="text-sm text-slate-500">123 Innovation Drive<br/>Tech Valley, CA 94025<br/>billing@ridesmart.ai</p>
+                                                <p className="text-sm text-slate-500">123 Innovation Drive<br />Tech Valley, CA 94025<br />billing@ridesmart.ai</p>
                                             </div>
                                             <div className="text-right">
                                                 <h2 className="text-3xl font-bold text-slate-900 mb-2">QUOTE</h2>
                                                 <p className="text-sm text-slate-500"><strong>Quote #:</strong> {generatedQuote.id}</p>
                                                 <p className="text-sm text-slate-500"><strong>Date:</strong> {generatedQuote.submittedDate}</p>
-                                                <p className="text-sm text-slate-500"><strong>Expires:</strong> {new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()}</p>
+                                                <p className="text-sm text-slate-500"><strong>Expires:</strong> {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
                                             </div>
                                         </div>
 
@@ -340,17 +345,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
 
                                                 {/* Hardware */}
                                                 {(generatedQuote.hardwareCost || 0) > 0 && (
-                                                <tr>
-                                                    <td className="py-4">
-                                                        <p className="font-bold text-slate-800">Legacy Hardware Retrofit Kit</p>
-                                                        <p className="text-xs text-slate-500">GPS & Telematics unit for pre-2016 vehicles.</p>
-                                                    </td>
-                                                    <td className="py-4 text-center font-mono">{generatedQuote.legacyBusCount}</td>
-                                                    <td className="py-4 text-right font-mono">$172.50</td>
-                                                    <td className="py-4 text-right font-bold text-slate-800">
-                                                        ${(generatedQuote.hardwareCost || 0).toLocaleString()}
-                                                    </td>
-                                                </tr>
+                                                    <tr>
+                                                        <td className="py-4">
+                                                            <p className="font-bold text-slate-800">Legacy Hardware Retrofit Kit</p>
+                                                            <p className="text-xs text-slate-500">GPS & Telematics unit for pre-2016 vehicles.</p>
+                                                        </td>
+                                                        <td className="py-4 text-center font-mono">{generatedQuote.legacyBusCount}</td>
+                                                        <td className="py-4 text-right font-mono">$172.50</td>
+                                                        <td className="py-4 text-right font-bold text-slate-800">
+                                                            ${(generatedQuote.hardwareCost || 0).toLocaleString()}
+                                                        </td>
+                                                    </tr>
                                                 )}
                                             </tbody>
                                         </table>
@@ -373,7 +378,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                                 <p className="text-xs text-slate-400 mt-2 text-right">Annual billing cycle.</p>
                                             </div>
                                         </div>
-                                        
+
                                         {/* Footer */}
                                         <div className="mt-12 pt-8 border-t border-slate-100 text-center">
                                             <p className="text-sm font-bold text-slate-900 mb-2">Thank you for choosing RideSmart!</p>
@@ -382,7 +387,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                     </div>
                                     <div className="flex gap-3">
                                         <button onClick={handlePrint} className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-900 transition-colors flex items-center justify-center gap-2">
-                                            <Printer size={16}/> Print / Save PDF
+                                            <Printer size={16} /> Print / Save PDF
                                         </button>
                                         <button onClick={() => { setGeneratedQuote(null); setShowQuoteModal(false); }} className="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-lg hover:bg-slate-50">
                                             Close
@@ -394,3 +399,26 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                     </div>
                 </div>
             )}
+
+            {/* ... Other Modals (Hardware, PO, Login) code is similar to previous and can be included here or managed as separate files ... */}
+            {/* Login Modal - Multi Tab */}
+            {showLoginModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                        <div className="bg-slate-900 p-6 text-center relative"><div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-600/50"><Bus size={32} className="text-white" /></div><h2 className="text-2xl font-bold text-white">Welcome Back</h2><p className="text-slate-400 text-sm">Sign in to your RideSmart account</p><button onClick={() => setShowLoginModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X size={20} /></button></div>
+                        <div className="flex border-b border-slate-200">{['OFFICE', 'DRIVER', 'SHOP', 'ADMIN'].map(tab => (<button key={tab} onClick={() => setLoginTab(tab as any)} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${loginTab === tab ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>{tab}</button>))}</div>
+                        <div className="p-8">
+                            <div className="space-y-4">
+                                {loginTab === 'OFFICE' && (<div><label className="block text-sm font-bold text-slate-700 mb-1">District ID</label><input type="text" placeholder="e.g. TUSD-882" className="w-full pl-4 pr-4 py-3 border border-slate-300 rounded-lg outline-none" value={districtId} onChange={(e) => setDistrictId(e.target.value)} /></div>)}
+                                {loginTab === 'ADMIN' && (<div className="text-center py-4"><div className="bg-red-50 p-4 rounded-lg border border-red-100 inline-block mb-4"><Shield size={48} className="mx-auto text-red-500 mb-2" /><p className="text-xs font-bold text-red-600 uppercase">Super Admin Console</p></div><input type="password" placeholder="Master Key" className="w-full px-4 py-3 border border-slate-300 rounded-lg outline-none focus:border-red-500 text-center mb-4" /></div>)}
+                                <button onClick={handleLoginSubmit} className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg">{loginTab === 'DRIVER' ? 'Launch Driver App' : loginTab === 'SHOP' ? 'Enter Shop Portal' : loginTab === 'ADMIN' ? 'Enter Controller Mode' : 'Sign In to Dashboard'}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default LandingPage;
