@@ -27,9 +27,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
         role: '',
         email: '',
         students: '',
-        role: '',
-        email: '',
-        students: '',
+
         newBuses: '',
         oldBuses: '',
         tier: 'PROFESSIONAL' as SubscriptionTier
@@ -85,8 +83,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
             email: quoteForm.email,
             studentCount: parseInt(quoteForm.students) || 0,
             busCount: busCount,
-            studentCount: parseInt(quoteForm.students) || 0,
-            busCount: busCount,
+
             newBusCount: newBusCount,
             legacyBusCount: legacyCount,
             tier: quoteForm.tier,
@@ -293,11 +290,106 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onQuoteRequest }) =>
                                 </form>
                             ) : (
                                 <div className="animate-in fade-in slide-in-from-bottom-4">
-                                    <div id="quote-document" className="bg-white p-8 border border-slate-200 shadow-sm mb-6 font-poppins text-slate-800">
-                                        <h2 className="text-2xl font-bold text-slate-900">QUOTE #{generatedQuote.id}</h2>
-                                        <p className="text-3xl font-bold text-blue-600">${generatedQuote.amount.toLocaleString()}</p>
+                                    <div id="quote-document" className="bg-white p-10 border border-slate-200 shadow-xl mb-6 font-sans text-slate-800 printable-content">
+                                        {/* Header */}
+                                        <div className="flex justify-between items-start mb-8 border-b border-slate-100 pb-8">
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-4">
+                                                    <div className="bg-blue-600 p-2 rounded-lg text-white"><Bus size={24} /></div>
+                                                    <span className="text-xl font-bold tracking-tight text-slate-900">RideSmart<span className="text-blue-600">.ai</span></span>
+                                                </div>
+                                                <p className="text-sm text-slate-500">123 Innovation Drive<br />Tech Valley, CA 94025<br />billing@ridesmart.ai</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <h2 className="text-3xl font-bold text-slate-900 mb-2">QUOTE</h2>
+                                                <p className="text-sm text-slate-500"><strong>Quote #:</strong> {generatedQuote.id}</p>
+                                                <p className="text-sm text-slate-500"><strong>Date:</strong> {generatedQuote.submittedDate}</p>
+                                                <p className="text-sm text-slate-500"><strong>Expires:</strong> {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Client Info */}
+                                        <div className="mb-8 p-6 bg-slate-50 rounded-lg">
+                                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Bill To</h3>
+                                            <p className="font-bold text-lg text-slate-900">{generatedQuote.districtName}</p>
+                                            <p className="text-sm text-slate-600">{generatedQuote.contactName} ({generatedQuote.contactRole})</p>
+                                            <p className="text-sm text-slate-600">{generatedQuote.email}</p>
+                                        </div>
+
+                                        {/* Line Items */}
+                                        <table className="w-full mb-8">
+                                            <thead>
+                                                <tr className="border-b-2 border-slate-100 text-left">
+                                                    <th className="py-3 text-sm font-bold text-slate-600">Description</th>
+                                                    <th className="py-3 text-sm font-bold text-slate-600 text-center">Qty</th>
+                                                    <th className="py-3 text-sm font-bold text-slate-600 text-right">Unit Price</th>
+                                                    <th className="py-3 text-sm font-bold text-slate-600 text-right">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-50">
+                                                {/* Software Subscription */}
+                                                <tr>
+                                                    <td className="py-4">
+                                                        <p className="font-bold text-slate-800">RideSmart {generatedQuote.tier} Subscription</p>
+                                                        <p className="text-xs text-slate-500">Annual recurring fee for AI routing and fleet logistics platform.</p>
+                                                    </td>
+                                                    <td className="py-4 text-center font-mono">{generatedQuote.busCount}</td>
+                                                    <td className="py-4 text-right font-mono text-slate-400">-</td>
+                                                    <td className="py-4 text-right font-bold text-slate-800">
+                                                        ${(generatedQuote.amount - (generatedQuote.hardwareCost || 0)).toLocaleString()}
+                                                    </td>
+                                                </tr>
+
+                                                {/* Hardware */}
+                                                {(generatedQuote.hardwareCost || 0) > 0 && (
+                                                    <tr>
+                                                        <td className="py-4">
+                                                            <p className="font-bold text-slate-800">Legacy Hardware Retrofit Kit</p>
+                                                            <p className="text-xs text-slate-500">GPS & Telematics unit for pre-2016 vehicles.</p>
+                                                        </td>
+                                                        <td className="py-4 text-center font-mono">{generatedQuote.legacyBusCount}</td>
+                                                        <td className="py-4 text-right font-mono">$172.50</td>
+                                                        <td className="py-4 text-right font-bold text-slate-800">
+                                                            ${(generatedQuote.hardwareCost || 0).toLocaleString()}
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+
+                                        {/* Totals */}
+                                        <div className="flex justify-end border-t-2 border-slate-900 pt-6">
+                                            <div className="w-1/2">
+                                                <div className="flex justify-between mb-2">
+                                                    <span className="text-slate-500 font-medium">Subtotal</span>
+                                                    <span className="font-bold text-slate-800">${generatedQuote.amount.toLocaleString()}</span>
+                                                </div>
+                                                <div className="flex justify-between mb-4">
+                                                    <span className="text-slate-500 font-medium">Tax (0%)</span>
+                                                    <span className="font-bold text-slate-800">$0.00</span>
+                                                </div>
+                                                <div className="flex justify-between text-xl border-t border-slate-200 pt-4">
+                                                    <span className="font-extrabold text-slate-900">Total</span>
+                                                    <span className="font-extrabold text-blue-600">${generatedQuote.amount.toLocaleString()}</span>
+                                                </div>
+                                                <p className="text-xs text-slate-400 mt-2 text-right">Annual billing cycle.</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Footer */}
+                                        <div className="mt-12 pt-8 border-t border-slate-100 text-center">
+                                            <p className="text-sm font-bold text-slate-900 mb-2">Thank you for choosing RideSmart!</p>
+                                            <p className="text-xs text-slate-500">This quote is valid for 30 days. To accept this quote, please sign and return to sales@ridesmart.ai or upload the PO via the dashboard.</p>
+                                        </div>
                                     </div>
-                                    <button onClick={() => { setGeneratedQuote(null); setShowQuoteModal(false); }} className="w-full mt-3 text-slate-500 text-sm hover:underline">Close</button>
+                                    <div className="flex gap-3">
+                                        <button onClick={handlePrint} className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-900 transition-colors flex items-center justify-center gap-2">
+                                            <Printer size={16} /> Print / Save PDF
+                                        </button>
+                                        <button onClick={() => { setGeneratedQuote(null); setShowQuoteModal(false); }} className="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-lg hover:bg-slate-50">
+                                            Close
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
